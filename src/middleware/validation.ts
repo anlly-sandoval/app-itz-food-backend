@@ -35,3 +35,16 @@ export const validateUserRequest = [
     .withMessage("El país debe ser un string"),
   handleValidationErrors,
 ]; //fin del validateUserRequest
+
+export const validateRestauranteRequest = [
+  body("restauranteName").notEmpty().withMessage("El nombre del restaurante es requerido"),
+  body("city").notEmpty().withMessage("La ciudad es requerida"),
+  body("country").notEmpty().withMessage("El pais es requerido"),
+  body("deliveryPrice").isFloat({min:0}).withMessage("El precio de entrega debe ser un numero positivo"),
+  body("estimatedDeliveryTime").isFloat({min:0}).withMessage("El tiempo estimado de entrega debe ser un numero positivo"),
+  body("cuisines").isArray().withMessage("Los tipos de cocina debe ser un arreglo").not().isEmpty().withMessage("El arreglo de cocinas no puede estar vacio"),
+  body("menuItems").isArray().withMessage("Los platillos deben ser un arreglo"),
+  body("menuItems.*.name").notEmpty().withMessage("El nombre del emnu es requerido"),
+  body("menuItems.*.price").isFloat({min:0}).withMessage("El precio del menu es requerido y debe ser un numero positivo"),
+  handleValidationErrors
+]; //fin de validaterestaurante

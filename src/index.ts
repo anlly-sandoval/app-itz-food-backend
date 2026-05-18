@@ -4,14 +4,26 @@ import cors from 'cors';
 import dotenv from 'dotenv';
 import mongoose from 'mongoose';
 import morgan from 'morgan';
+import { v2 as cloudinary } from 'cloudinary'
+import  restauranteRoutes  from './routes/restauranteRoutes.js'
 dotenv.config();
 
 //importamos las rutas de usuarios
 import userRoutes from './routes/userRoutes.js';
 
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME || "";
+const apiKey = process.env.CLOUDINARY_API_KEY || "";
+const apiSecret = process.env.CLOUDINARY_API_SECRET || "";
+
+cloudinary.config({
+  cloud_name: cloudName,
+  api_key: apiKey,
+  api_secret: apiSecret
+});
+
 mongoose.connect(process.env.DB_CONNECTION_STRING as string).then(() => {
     console.log("Base de datos conectada");
-    console.log(process.env.DB_CONNECTION_STRING);
+    //console.log(process.env.DB_CONNECTION_STRING);
   })
   .catch((error) => {
     console.log(error);
@@ -32,6 +44,7 @@ app.get('/', async(req: Request, res: Response)=>{
 });
 
 app.use('/api/user', userRoutes);
+app.use('/api/restaurante', restauranteRoutes);
 
 const port = process.env.port || 3000;
 app.listen(port, ()=>{
@@ -45,3 +58,4 @@ app.get("/", async (req: Request, res: Response) => {
 app.listen(3000, () => {
   console.log("Servidor corriendo en el puerto 3000");
 });
+
