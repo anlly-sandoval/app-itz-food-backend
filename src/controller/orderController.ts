@@ -1,6 +1,6 @@
-import { Request, Response} from "express";
+import { type Request, type Response} from "express";
 import Stripe from 'stripe';
-import Restaurante, {MenuItemType} from '../model/restaurantModel.js';
+import Restaurante, { type MenuItemType } from '../model/restaurantModel.js';
 import Order from '../model/orderModels.js';
 import { console } from "inspector";
 
