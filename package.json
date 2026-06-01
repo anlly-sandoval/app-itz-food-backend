@@ -5,7 +5,8 @@
   "main": "./src/index.ts",
   "type": "module",
   "scripts": {
-    "dev": "nodemon --exec npx tsx src/index.ts",
+    "dev": "concurrently \"nodemon --exec npx tsx src/index.ts\" \"npm run stripe\" ",
+    "stripe": "stripe listen --forward-to localhost:3000/api/checkou/webhook",
     "build": "npm i && npx tsc",
     "start": "node dist/index.js"
   },
@@ -16,6 +17,7 @@
     "@types/morgan": "^1.9.10",
     "@types/multer": "^2.1.0",
     "cloudinary": "^2.10.0",
+    "concurrently": "^10.0.1",
     "cors": "^2.8.6",
     "dotenv": "^17.3.1",
     "express": "^5.2.1",
