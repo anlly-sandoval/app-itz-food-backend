@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "concurrently \"nodemon --exec npx tsx src/index.ts\" \"npm run stripe\" ",
-    "stripe": "stripe listen --forward-to localhost:3000/api/checkou/webhook",
+    "stripe": "stripe listen --forward-to localhost:3000/api/order/checkout/webhook",
     "build": "npm i && npx tsc",
     "start": "node dist/index.js"
   },

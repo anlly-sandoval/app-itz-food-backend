@@ -1,61 +1,67 @@
-import type { Request, Response } from 'express';
+import type { Request, Response, NextFunction } from 'express';
 import express from 'express';
 import cors from 'cors';
 import dotenv from 'dotenv';
-import mongoose from 'mongoose';
+import mongoose from "mongoose";
 import morgan from 'morgan';
-import { v2 as cloudinary } from 'cloudinary'
-import  restauranteRoutes  from './routes/restauranteRoutes.js'
+import {v2 as cloudinary} from 'cloudinary';
+
 dotenv.config();
 
-//importamos las rutas de usuarios
 import userRoutes from './routes/userRoutes.js';
 
-const cloudName = process.env.CLOUDINARY_CLOUD_NAME || "";
-const apiKey = process.env.CLOUDINARY_API_KEY || "";
-const apiSecret = process.env.CLOUDINARY_API_SECRET || "";
+//Importamos las rutas para el restaurante 
+import restauranteRoutes from './routes/restauranteRoutes.js';
 
+//Importamos la ruta para ordenes
+import orderRoutes from './routes/orderRoutes.js';
+
+const cloudName = process.env.CLOUDINARY_CLOUD_NAME || "";
+const apikey = process.env.CLOUDINARY_API_KEY || "";
+const apiSecret = process.env.CLOUDINARY_API_SECRET || "";
 cloudinary.config({
-  cloud_name: cloudName,
-  api_key: apiKey,
-  api_secret: apiSecret
+    cloud_name: cloudName,
+    api_key: apikey,
+    api_secret: apiSecret
 });
 
-mongoose.connect(process.env.DB_CONNECTION_STRING as string).then(() => {
+
+mongoose.connect(process.env.DB_CONNECTION_STRING as string)
+.then(() => {
     console.log("Base de datos conectada");
-    //console.log(process.env.DB_CONNECTION_STRING);
-  })
-  .catch((error) => {
-    console.log(error);
-    console.log("Error al conectar a la base de datos");
-  });
+})
+.catch(() => {
+    console.log("Error al conectarse a la base de datos");
+});
 
 const app = express();
+app.use('/api/order/checkout/webhook', express.raw({type:"*/*"}))
+
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: process.env.FRONTEND_URL || "https://localhost:5173",
+    credentials: true
+}));
 app.use(morgan('dev'));
-
-//ruta para verificar que el servidor esta ejecutandose\
-app.get('/health', async(req: Request, res: Response)=>{
-  res.send({message: 'Servidor OK'})
+app.get('/health', async (req: Request, res: Response) => {
+    res.send({ message: '!servidor OK!' });
 });
-app.get('/', async(req: Request, res: Response)=>{
-  res.redirect('/health');
+app.get('/', async (req: Request, res: Response) => {
+    res.redirect('/health');
 });
 
-app.use('/api/user', userRoutes);
+app.use("/api/user", userRoutes);
 app.use('/api/restaurante', restauranteRoutes);
+app.use('/api/order', orderRoutes);
 
-const port = process.env.port || 3000;
-app.listen(port, ()=>{
-  console.log("App corriendo en el puerto "+ port)
-})
-
-app.get("/", async (req: Request, res: Response) => {
-  res.send("Hola mundo desde Express y TypeScript!");
+// Manejador global de errores - devuelve JSON en lugar de HTML
+app.use((err: any, req: Request, res: Response, next: NextFunction) => {
+    const status = err.status || err.statusCode || 500;
+    const message = err.message || "Error interno del servidor";
+    res.status(status).json({ message });
 });
 
-app.listen(3000, () => {
-  console.log("Servidor corriendo en el puerto 3000");
+const port = process.env.PORT || 3000;
+app.listen(port, () => {
+    console.log("Servidor corriendo en el puerto: " + port);
 });
-
